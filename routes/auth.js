@@ -1,7 +1,8 @@
 const express = require("express");
 const UserModel = require("../model/UserModel");
 const router = express.Router();
-const passport = require("passport")
+const passport = require("passport");
+const isLoggedIn = require("../middleware");
 
 router.get("/signup", (req, res) => {
   res.render("signup");
@@ -9,14 +10,18 @@ router.get("/signup", (req, res) => {
 router.get("/login", (req, res) => {
   res.render("login");
 });
-router.get("/", (req, res) => {
+router.get("/",isLoggedIn,(req, res) => {
   res.render("home");
 });
 router.post("/signup", async (req, res) => {
-  const { username, email, password, gender } = req.body;
-  const user = new UserModel({ username, email, gender });
-  const newUser = await UserModel.register(user, password);
-  res.redirect("/");
+try {
+    const { username, email, password, gender } = req.body;
+    const user = new UserModel({ username, email, gender });
+    await UserModel.register(user, password);
+    res.redirect("/");
+} catch (error) {
+    res.send(error.message)
+}
 });
 
 router.post("/login",passport.authenticate("local", { failureRedirect: "/login" }),function (req, res) {
