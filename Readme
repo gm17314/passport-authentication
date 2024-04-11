@@ -47,7 +47,9 @@ passport.use(new LocalStrategy(UserModel.authenticate()));
 
 ### Step 3: Handle Signup Form
 ```javascript
-const newUser = await UserModel.register(user, password);
+  const { username, password } = req.body;
+  const user = new UserModel({ username });
+  await UserModel.register(user, password);
 ```
 
 ### Step 4: Handle Login Form
